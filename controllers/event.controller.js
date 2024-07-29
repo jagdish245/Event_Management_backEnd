@@ -45,29 +45,46 @@ const getEventById = async (req, res) => {
 
 const registerForEvent = async (req, res) => {
   try {
-    const {eventId} = req.body;
+    const { eventId } = req.body;
+    const userId = req.user?._id;
 
-    const user = User.findById(req.user._id);
-    const event = Event.findById(eventId);
-
-    if(!user || !event){
-      return res.status(404).json({Message: "User of Event not found"})
+    if (!eventId || !userId) {
+      return res
+        .status(400)
+        .json({ Message: "Event ID and User ID are required" });
     }
 
-    const isRegistered = user.events.some((e)=> e.event.toString() === eventId);
+    const user = await User.findById(userId);
+    const event = await Event.findById(eventId);
 
-    if(isRegistered){
-      return res.status(400).json({Message: "Already registered for the event"})
+    if (!user || !event) {
+      return res.status(404).json({ Message: "User of Event not found" });
     }
 
-    user.events.push({event: eventId, registrationDate: new Date() });
+    if (!Array.isArray(user.events)) {
+      return res
+        .status(500)
+        .json({ Message: "User events data is not an array" });
+    }
+    const isRegistered = user.events.some(
+      (e) => e.event.toString() === eventId
+    );
+
+    if (isRegistered) {
+      return res
+        .status(400)
+        .json({ Message: "Already registered for the event" });
+    }
+
+    user.events.push({ event: eventId, registrationDate: new Date() });
     event.registeredUsers.push(userId);
 
-    await user.save()
-    await event.save()
+    await user.save();
+    await event.save();
 
-    res.status(200).json({Message: "Successfully Registered for the Event", event})
-
+    res
+      .status(200)
+      .json({ Message: "Successfully Registered for the Event", event });
   } catch (error) {
     console.error(error);
     res.status(500).json({ Message: error });
