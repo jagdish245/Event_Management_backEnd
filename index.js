@@ -20,7 +20,7 @@ app.use("/api/admin", adminRoute);
 
 mongoose
   .connect(
-    "mongodb+srv://client:client123@eventmanagement.t9xzgqk.mongodb.net/?retryWrites=true&w=majority&appName=eventManagement"
+    process.env.DATABASE_URI
   )
   .then(() => {
     console.log("Connected to database");
