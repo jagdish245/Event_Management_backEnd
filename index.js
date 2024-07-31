@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const userRoute = require("./routes/user.route");
 const eventRoute = require("./routes/event.route");
 const adminRoute = require("./routes/admin.route");
+const contactRoute = require("./routes/contact.route")
 const port = process.env.PORT || 3001;
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -17,6 +18,7 @@ app.use(cookieParser());
 app.use("/api/users", userRoute);
 app.use("/api/events", eventRoute);
 app.use("/api/admin", adminRoute);
+app.use("/api/contact", contactRoute)
 
 mongoose
   .connect(
